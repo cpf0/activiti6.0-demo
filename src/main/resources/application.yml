@@ -1,0 +1,11 @@
+server:
+  port: 8080
+  context-path: /
+spring:
+  profiles:
+    active: dev
+  activiti:
+    database-schema-update: true
+    history-level: full
+    check-process-definitions: false
+

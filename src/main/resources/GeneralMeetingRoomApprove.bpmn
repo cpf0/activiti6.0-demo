@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.activiti.org/testm1561105216636" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" expressionLanguage="http://www.w3.org/1999/XPath" id="m1561105216636" name="" targetNamespace="http://www.activiti.org/testm1561105216636" typeLanguage="http://www.w3.org/2001/XMLSchema">
+  <process id="GeneralMeetingRoomApprove" isClosed="false" isExecutable="true" processType="None">
+    <endEvent id="ManagerEndEvent" name="经理结束流程"/>
+    <userTask activiti:assignee="#{roleSecretary}" activiti:async="false" activiti:exclusive="true" id="secretaryApprove" name="前台秘书审批"/>
+    <exclusiveGateway gatewayDirection="Unspecified" id="exclusiveGateway1" name="秘书部排它网关">
+      <extensionElements>
+        <activiti:executionListener class="org.activiti.demo.business.listener.execution.SecretaryApproveListener" event="start"/>
+      </extensionElements>
+    </exclusiveGateway>
+    <userTask activiti:assignee="#{roleManager}" activiti:exclusive="true" id="managerApprove" name="部门经理审批"/>
+    <exclusiveGateway gatewayDirection="Unspecified" id="exclusiveGateway2" name="经理部排它网关">
+      <extensionElements>
+        <activiti:executionListener class="org.activiti.demo.business.listener.execution.DepartManagerApproveListener" event="start"/>
+      </extensionElements>
+    </exclusiveGateway>
+    <sequenceFlow id="_12" sourceRef="managerApprove" targetRef="exclusiveGateway2"/>
+    <sequenceFlow id="_13" sourceRef="exclusiveGateway2" targetRef="ManagerEndEvent">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${managerApprove==1||managerApprove==2}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask activiti:assignee="#{approveUser}" activiti:exclusive="true" id="submitMeeting" name="提交会议预定信息">
+      <extensionElements>
+        <activiti:taskListener class="org.activiti.demo.business.listener.task.SubmitApproveListener" event="create"/>
+      </extensionElements>
+    </userTask>
+    <startEvent id="StartEvent" name="普通会议室审批流程开始"/>
+    <sequenceFlow id="_18" sourceRef="StartEvent" targetRef="submitMeeting"/>
+    <sequenceFlow id="_2" sourceRef="submitMeeting" targetRef="secretaryApprove"/>
+    <sequenceFlow id="_8" sourceRef="secretaryApprove" targetRef="exclusiveGateway1"/>
+    <sequenceFlow id="_9" sourceRef="exclusiveGateway1" targetRef="managerApprove">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${secretaryApprove==2}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="_10" name="秘书回退申请" sourceRef="exclusiveGateway1" targetRef="submitMeeting">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${secretaryApprove==3}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="_11" name="部门经理回退申请" sourceRef="exclusiveGateway2" targetRef="submitMeeting">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${managerApprove==3}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="SecretaryEndEvent" name="秘书结束流程"/>
+    <sequenceFlow id="_4" sourceRef="exclusiveGateway1" targetRef="SecretaryEndEvent">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${secretaryApprove==2}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram documentation="background=#3C3F41;count=1;horizontalcount=1;orientation=0;width=842.4;height=1195.2;imageableWidth=832.4;imageableHeight=1185.2;imageableX=5.0;imageableY=5.0" id="Diagram-_1" name="New Diagram">
+    <bpmndi:BPMNPlane bpmnElement="GeneralMeetingRoomApprove">
+      <bpmndi:BPMNShape bpmnElement="ManagerEndEvent" id="Shape-ManagerEndEvent">
+        <dc:Bounds height="32.0" width="32.0" x="670.0" y="205.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="secretaryApprove" id="Shape-secretaryApprove">
+        <dc:Bounds height="55.0" width="85.0" x="175.0" y="95.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusiveGateway1" id="Shape-exclusiveGateway1" isMarkerVisible="false">
+        <dc:Bounds height="32.0" width="32.0" x="335.0" y="265.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="managerApprove" id="Shape-managerApprove">
+        <dc:Bounds height="55.0" width="85.0" x="445.0" y="110.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusiveGateway2" id="Shape-exclusiveGateway2" isMarkerVisible="false">
+        <dc:Bounds height="32.0" width="32.0" x="575.0" y="240.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="submitMeeting" id="Shape-submitMeeting">
+        <dc:Bounds height="55.0" width="85.0" x="70.0" y="210.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="StartEvent" id="Shape-StartEvent">
+        <dc:Bounds height="32.0" width="32.0" x="-10.0" y="220.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SecretaryEndEvent" id="Shape-SecretaryEndEvent">
+        <dc:Bounds height="32.0" width="32.0" x="335.0" y="375.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_13" id="BPMNEdge__13" sourceElement="exclusiveGateway2" targetElement="EndEvent1">
+        <di:waypoint x="607.0" y="256.0"/>
+        <di:waypoint x="670.0" y="221.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_12" id="BPMNEdge__12" sourceElement="departManager" targetElement="exclusiveGateway2">
+        <di:waypoint x="530.0" y="137.5"/>
+        <di:waypoint x="575.0" y="256.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_18" id="BPMNEdge__18" sourceElement="StartEvent" targetElement="submitMeeting">
+        <di:waypoint x="22.0" y="236.0"/>
+        <di:waypoint x="70.0" y="237.5"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_2" id="BPMNEdge__2" sourceElement="submitMeeting" targetElement="secretary">
+        <di:waypoint x="155.0" y="237.5"/>
+        <di:waypoint x="175.0" y="122.5"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_4" id="BPMNEdge__4" sourceElement="exclusiveGateway1" targetElement="_3">
+        <di:waypoint x="351.0" y="297.0"/>
+        <di:waypoint x="351.0" y="375.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_8" id="BPMNEdge__8" sourceElement="secretary" targetElement="exclusiveGateway1">
+        <di:waypoint x="260.0" y="122.5"/>
+        <di:waypoint x="335.0" y="281.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_9" id="BPMNEdge__9" sourceElement="exclusiveGateway1" targetElement="departManager">
+        <di:waypoint x="367.0" y="281.0"/>
+        <di:waypoint x="445.0" y="137.5"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_11" id="BPMNEdge__11" sourceElement="exclusiveGateway2" targetElement="submitMeeting">
+        <di:waypoint x="575.0" y="256.0"/>
+        <di:waypoint x="155.0" y="237.5"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_10" id="BPMNEdge__10" sourceElement="exclusiveGateway1" targetElement="submitMeeting">
+        <di:waypoint x="335.0" y="281.0"/>
+        <di:waypoint x="155.0" y="237.5"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
